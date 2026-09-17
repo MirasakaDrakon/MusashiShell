@@ -1,0 +1,152 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+# =========================================================================== #
+# Project metadata
+# =========================================================================== #
+[project]
+name = "musashishell"
+version = "1.5.0"
+description = "Telegram-controlled reverse shell"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "GPL-3.0-or-later" }
+authors = [
+    { name = "MusashiShell", email = "you@example.com" },
+]
+keywords = ["telegram", "bot", "remote", "administration", "builder", "c2", "cc", "rat", "redteam", "red-team", "reverse-shell"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: System Administrators",
+    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: MacOS",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: System :: Systems Administration",
+    "Topic :: Communications :: Chat",
+]
+
+# =========================================================================== #
+# Runtime dependencies — the bare minimum to run the builder
+# =========================================================================== #
+dependencies = [
+    "rich",
+    "pyinstaller",
+    "aiogram",
+]
+
+# =========================================================================== #
+# Optional dependency groups
+# =========================================================================== #
+[project.optional-dependencies]
+# Nicer builder banner (ASCII art). Optional — builder falls back gracefully.
+pretty = [
+    "pyfiglet",
+]
+
+# Icon generation from PNG (PNG -> multi-size .ico).
+icons = [
+    "pillow",
+]
+
+# Everything a normal user would want in one shot.
+full = [
+    "pyfiglet",
+    "pillow",
+]
+
+# Developer tooling: linting, formatting, type checking.
+dev = [
+    "ruff",
+    "mypy",
+    "pytest",
+]
+
+# =========================================================================== #
+# CLI entry points
+# =========================================================================== #
+[project.scripts]
+musashi = "builder:main"
+
+# =========================================================================== #
+# URLs
+# =========================================================================== #
+[project.urls]
+Homepage = "https://github.com/MirasakaDrakon/MusashiShell"
+Source   = "https://github.com/MirasakaDrakon/MusashiShell"
+Issues   = "https://github.com/MirasakaDrakon/MusashiShell/issues"
+
+# =========================================================================== #
+# Setuptools: package layout
+# =========================================================================== #
+[tool.setuptools]
+# Nothing to "package" in the classic sense — the project is a script plus
+# a template. We still ship the template as package data so `pip install`
+# places it in a predictable location.
+py-modules = ["builder"]
+
+[tool.setuptools.package-data]
+"*" = ["resources/*.py", "resources/*.ico", "resources/*.icns"]
+
+# =========================================================================== #
+# Ruff — linter / formatter
+# =========================================================================== #
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+exclude = [
+    ".git",
+    ".venv",
+    "build",
+    "dist",
+    "logs",
+    "cfg",
+]
+
+[tool.ruff.lint]
+select = [
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # pyflakes
+    "I",    # isort
+    "B",    # flake8-bugbear
+    "UP",   # pyupgrade
+    "C4",   # flake8-comprehensions
+]
+ignore = [
+    "E501",  # line too long — handled by line-length above
+    "B008",  # function call in default arg (used in some aiogram patterns)
+]
+
+[tool.ruff.lint.per-file-ignores]
+# The client template is deliberately minified.
+"resources/template.py" = ["E", "W", "F", "I"]
+
+# =========================================================================== #
+# Mypy — static type checking
+# =========================================================================== #
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true
+exclude = [
+    "build/",
+    "dist/",
+    "resources/template.py",
+]
+
+# =========================================================================== #
+# Pytest
+# =========================================================================== #
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests"]
+addopts = "-ra -q"
